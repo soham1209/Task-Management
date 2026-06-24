@@ -1,0 +1,62 @@
+[
+  {
+    "model": "tasks.task",
+    "pk": 1,
+    "fields": {
+      "title": "Set up project repository",
+      "description": "Initialize git repo and push the initial commit.",
+      "status": "pending",
+      "created_at": "2026-06-18T09:00:00Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 2,
+    "fields": {
+      "title": "Design database schema",
+      "description": "Define the Task model fields and relationships.",
+      "status": "pending",
+      "created_at": "2026-06-18T09:15:00Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 3,
+    "fields": {
+      "title": "Implement task API",
+      "description": "Build REST endpoints for listing, creating, and updating tasks.",
+      "status": "in_progress",
+      "created_at": "2026-06-19T10:00:00Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 4,
+    "fields": {
+      "title": "Build frontend task list",
+      "description": "Create a React component to display tasks fetched from the API.",
+      "status": "in_progress",
+      "created_at": "2026-06-19T11:30:00Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 5,
+    "fields": {
+      "title": "Write unit tests",
+      "description": "",
+      "status": "done",
+      "created_at": "2026-06-20T08:00:00Z"
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": 6,
+    "fields": {
+      "title": "Set up CI pipeline",
+      "description": "Configure automated test runs on every push.",
+      "status": "done",
+      "created_at": "2026-06-20T14:45:00Z"
+    }
+  }
+]

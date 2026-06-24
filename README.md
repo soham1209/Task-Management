@@ -1,6 +1,6 @@
 # Task Manager
 
-Initial project scaffold for the Task Manager assignment. Backend is Django + Django REST Framework (SQLite), frontend is React (Vite) + Axios. No business logic has been implemented yet — this sets up structure, configuration, and tooling only.
+Task Manager assignment. Backend is Django + Django REST Framework (SQLite), frontend is React (Vite) + Axios. The backend exposes a `Task` model and API; the frontend is scaffolded but not yet wired up to it.
 
 ## Project Structure
 
@@ -11,7 +11,8 @@ task-manager/
 │   ├── manage.py
 │   ├── requirements.txt
 │   ├── task_manager/        # Django project (settings, urls, wsgi/asgi)
-│   └── tasks/                # Django app (models/views/serializers go here)
+│   └── tasks/                # Django app (models, serializers, views, urls)
+│       └── fixtures/         # sample_tasks.json fixture
 ├── frontend/
 │   ├── src/
 │   │   ├── components/       # React components go here
@@ -79,6 +80,21 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
+### Loading sample data
+
+A fixture with 6 sample tasks (2 `pending`, 2 `in_progress`, 2 `done`) is provided at `tasks/fixtures/sample_tasks.json`. To load it:
+
+```bash
+cd task-manager/backend
+source venv/Scripts/activate
+python manage.py migrate          # ensure tables exist first
+python manage.py loaddata sample_tasks
+```
+
+Django automatically searches each app's `fixtures/` directory, so the fixture name (`sample_tasks`, without the `.json` extension) is enough — no path or app prefix needed. Reviewers can then hit `GET http://localhost:8000/api/tasks/` (or `?status=pending` / `?status=in_progress` / `?status=done`) to see the loaded data immediately.
+
+Re-running `loaddata` is safe: each task has a fixed primary key, so it overwrites the same rows rather than duplicating them.
+
 ## Frontend Setup
 
 Commands used to create the frontend:
@@ -110,6 +126,4 @@ The app will be available at `http://localhost:3000/` (the Vite dev server port 
 
 ## Next Steps (not yet implemented)
 
-- Define the `Task` model in `tasks/models.py`.
-- Add serializers, views/viewsets, and URL routes for the `tasks` app.
 - Wire up `src/components` with components that call the API via axios.
