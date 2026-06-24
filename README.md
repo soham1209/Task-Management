@@ -95,6 +95,10 @@ Django automatically searches each app's `fixtures/` directory, so the fixture n
 
 Re-running `loaddata` is safe: each task has a fixed primary key, so it overwrites the same rows rather than duplicating them.
 
+### Testing the API
+
+See [`backend/API_TESTING_CHECKLIST.md`](backend/API_TESTING_CHECKLIST.md) for a manual testing checklist covering every endpoint, with example requests and responses.
+
 ## Frontend Setup
 
 Commands used to create the frontend:
