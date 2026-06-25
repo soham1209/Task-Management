@@ -1,64 +1,11 @@
-import { useEffect, useState } from 'react';
-import { getTasks, updateTaskStatus } from '../api/api';
+import { useTasks } from '../hooks/useTasks';
 import TaskItem from './TaskItem';
 
 function TaskList({ refreshTrigger, statusFilter }) {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [updatingIds, setUpdatingIds] = useState({});
-  const [statusErrors, setStatusErrors] = useState({});
-
-  useEffect(() => {
-    let isMounted = true;
-
-    setLoading(true);
-    setError(null);
-
-    getTasks(statusFilter)
-      .then((response) => {
-        if (isMounted) setTasks(response.data);
-      })
-      .catch(() => {
-        if (isMounted) setError('Failed to load tasks. Please try again later.');
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [refreshTrigger, statusFilter]);
-
-  const handleStatusChange = async (taskId, newStatus) => {
-    const previousTask = tasks.find((task) => task.id === taskId);
-    if (!previousTask || previousTask.status === newStatus) return;
-
-    // Optimistic update so the dropdown reflects the choice immediately.
-    setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task))
-    );
-    setUpdatingIds((prev) => ({ ...prev, [taskId]: true }));
-    setStatusErrors((prev) => ({ ...prev, [taskId]: null }));
-
-    try {
-      const response = await updateTaskStatus(taskId, newStatus);
-      setTasks((prev) =>
-        prev.map((task) => (task.id === taskId ? response.data : task))
-      );
-    } catch (err) {
-      // Roll back to the pre-change task on failure.
-      setTasks((prev) =>
-        prev.map((task) => (task.id === taskId ? previousTask : task))
-      );
-      const data = err.response?.data;
-      const message = data?.status?.[0] || data?.detail || 'Failed to update status. Please try again.';
-      setStatusErrors((prev) => ({ ...prev, [taskId]: message }));
-    } finally {
-      setUpdatingIds((prev) => ({ ...prev, [taskId]: false }));
-    }
-  };
+  const { tasks, loading, error, updatingIds, statusErrors, updateStatus } = useTasks({
+    statusFilter,
+    refreshTrigger,
+  });
 
   if (loading) {
     return <p className="text-gray-600">Loading tasks...</p>;
@@ -82,7 +29,7 @@ function TaskList({ refreshTrigger, statusFilter }) {
         <TaskItem
           key={task.id}
           task={task}
-          onStatusChange={handleStatusChange}
+          onStatusChange={updateStatus}
           updating={!!updatingIds[task.id]}
           error={statusErrors[task.id]}
         />

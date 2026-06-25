@@ -1,9 +1,6 @@
-const FILTER_OPTIONS = [
-  { value: '', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'done', label: 'Done' },
-];
+import { TASK_STATUS_OPTIONS } from '../constants/taskStatus';
+
+const FILTER_OPTIONS = [{ value: '', label: 'All' }, ...TASK_STATUS_OPTIONS];
 
 function TaskFilter({ value, onChange }) {
   return (

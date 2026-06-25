@@ -1,14 +1,4 @@
-const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'done', label: 'Done' },
-];
-
-const STATUS_STYLES = {
-  pending: 'bg-amber-100 text-amber-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  done: 'bg-green-100 text-green-800',
-};
+import { TASK_STATUS_OPTIONS, TASK_STATUS_STYLES } from '../constants/taskStatus';
 
 function TaskItem({ task, onStatusChange, updating, error }) {
   return (
@@ -23,9 +13,9 @@ function TaskItem({ task, onStatusChange, updating, error }) {
           value={task.status}
           onChange={(event) => onStatusChange(task.id, event.target.value)}
           disabled={updating}
-          className={`inline-block rounded px-2 py-0.5 text-xs font-semibold uppercase border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 ${STATUS_STYLES[task.status]}`}
+          className={`inline-block rounded px-2 py-0.5 text-xs font-semibold uppercase border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 ${TASK_STATUS_STYLES[task.status]}`}
         >
-          {STATUS_OPTIONS.map((option) => (
+          {TASK_STATUS_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

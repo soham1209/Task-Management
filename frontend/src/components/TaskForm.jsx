@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { createTask } from '../api/api';
+import { createTask } from '../api/tasks';
+import FormField from './FormField';
 
 const initialForm = { title: '', description: '' };
 
@@ -38,43 +39,24 @@ function TaskForm({ onTaskCreated }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-6">
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-1">
-          Title
-        </label>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          value={form.title}
-          onChange={handleChange}
-          className="w-full rounded border border-gray-300 px-3 py-2"
-        />
-        {fieldErrors.title && (
-          <p className="text-sm text-red-600 mt-1">
-            {[].concat(fieldErrors.title).join(' ')}
-          </p>
-        )}
-      </div>
+      <FormField
+        id="title"
+        label="Title"
+        type="text"
+        value={form.title}
+        onChange={handleChange}
+        error={fieldErrors.title}
+      />
 
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          rows={3}
-          className="w-full rounded border border-gray-300 px-3 py-2"
-        />
-        {fieldErrors.description && (
-          <p className="text-sm text-red-600 mt-1">
-            {[].concat(fieldErrors.description).join(' ')}
-          </p>
-        )}
-      </div>
+      <FormField
+        id="description"
+        label="Description"
+        as="textarea"
+        rows={3}
+        value={form.description}
+        onChange={handleChange}
+        error={fieldErrors.description}
+      />
 
       {formError && <p className="text-sm text-red-600">{formError}</p>}
 

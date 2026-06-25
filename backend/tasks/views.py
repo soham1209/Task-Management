@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from .models import Task
-from .serializers import TaskSerializer, TaskStatusUpdateSerializer
+from .serializers import STATUS_CHOICES_DISPLAY, TaskSerializer, TaskStatusUpdateSerializer
 
 
 class TaskListCreateView(generics.ListCreateAPIView):
@@ -16,12 +16,11 @@ class TaskListCreateView(generics.ListCreateAPIView):
         if status_param is None:
             return queryset
 
-        valid_statuses = Task.Status.values
-        if status_param not in valid_statuses:
+        if status_param not in Task.Status.values:
             raise ValidationError({
                 'status': (
                     f"Invalid status '{status_param}'. "
-                    f"Must be one of: {', '.join(valid_statuses)}."
+                    f"Must be one of: {STATUS_CHOICES_DISPLAY}."
                 )
             })
 

@@ -3,11 +3,9 @@ from rest_framework import serializers
 from .models import Task
 
 STATUS_REQUIRED_MESSAGE = 'Status is required.'
+STATUS_CHOICES_DISPLAY = ', '.join(Task.Status.values)
 STATUS_CHOICE_ERROR_MESSAGES = {
-    'invalid_choice': (
-        'Status must be one of: '
-        f'{", ".join(value for value, _ in Task.Status.choices)}.'
-    ),
+    'invalid_choice': f'Status must be one of: {STATUS_CHOICES_DISPLAY}.',
 }
 
 
