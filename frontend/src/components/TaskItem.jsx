@@ -1,7 +1,16 @@
+import { Trash2 } from 'lucide-react';
 import { TASK_STATUS_OPTIONS, TASK_STATUS_STYLES, TASK_STATUS_ACCENTS } from '../constants/taskStatus';
 import Spinner from './Spinner';
 
-function TaskItem({ task, onStatusChange, updating, error }) {
+function TaskItem({ task, onStatusChange, onDelete, updating, deleting, error }) {
+  const busy = updating || deleting;
+
+  const handleDelete = () => {
+    if (window.confirm(`Delete "${task.title}"? This cannot be undone.`)) {
+      onDelete(task.id);
+    }
+  };
+
   return (
     <li className="group bg-white rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-lg border border-slate-200/60 transition-all duration-200 flex items-stretch gap-4 relative overflow-hidden hover:-translate-y-0.5">
       <div className={`w-1.5 rounded-full shrink-0 ${TASK_STATUS_ACCENTS[task.status]}`} />
@@ -24,12 +33,12 @@ function TaskItem({ task, onStatusChange, updating, error }) {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            {updating && <Spinner className="h-3.5 w-3.5 text-slate-400" />}
+            {busy && <Spinner className="h-3.5 w-3.5 text-slate-400" />}
             <div className="relative">
               <select
                 value={task.status}
                 onChange={(event) => onStatusChange(task.id, event.target.value)}
-                disabled={updating}
+                disabled={busy}
                 className={`appearance-none rounded-xl pl-3.5 pr-8 py-1.5 text-xs font-bold uppercase tracking-wide cursor-pointer border focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all disabled:cursor-not-allowed disabled:opacity-70 ${TASK_STATUS_STYLES[task.status]}`}
               >
                 {TASK_STATUS_OPTIONS.map((option) => (
@@ -44,6 +53,17 @@ function TaskItem({ task, onStatusChange, updating, error }) {
                 </svg>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={busy}
+              title="Delete task"
+              aria-label={`Delete ${task.title}`}
+              className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
 

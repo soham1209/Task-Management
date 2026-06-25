@@ -17,3 +17,7 @@ export const createTask = (task) => {
 export const updateTaskStatus = (id, status) => {
   return client.patch(`/tasks/${id}/`, { status });
 };
+
+export const deleteTask = (id) => {
+  return client.delete(`/tasks/${id}/`);
+};

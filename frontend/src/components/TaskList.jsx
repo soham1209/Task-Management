@@ -5,7 +5,17 @@ import TaskFilter from './TaskFilter';
 import Spinner from './Spinner';
 
 function TaskList({ refreshTrigger, statusFilter, onFilterChange }) {
-  const { tasks, loading, error, updatingIds, statusErrors, updateStatus } = useTasks({
+  const {
+    tasks,
+    loading,
+    error,
+    updatingIds,
+    statusErrors,
+    updateStatus,
+    deletingIds,
+    deleteErrors,
+    removeTask,
+  } = useTasks({
     statusFilter,
     refreshTrigger,
   });
@@ -49,8 +59,10 @@ function TaskList({ refreshTrigger, statusFilter, onFilterChange }) {
               key={task.id}
               task={task}
               onStatusChange={updateStatus}
+              onDelete={removeTask}
               updating={!!updatingIds[task.id]}
-              error={statusErrors[task.id]}
+              deleting={!!deletingIds[task.id]}
+              error={statusErrors[task.id] || deleteErrors[task.id]}
             />
           ))}
         </ul>

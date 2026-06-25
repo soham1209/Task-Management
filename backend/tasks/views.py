@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
@@ -27,10 +27,10 @@ class TaskListCreateView(generics.ListCreateAPIView):
         return queryset.filter(status=status_param)
 
 
-class TaskStatusUpdateView(generics.UpdateAPIView):
+class TaskDetailView(mixins.DestroyModelMixin, generics.UpdateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskStatusUpdateSerializer
-    http_method_names = ['patch', 'options']
+    http_method_names = ['patch', 'delete', 'options']
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -38,3 +38,6 @@ class TaskStatusUpdateView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(TaskSerializer(instance).data)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)

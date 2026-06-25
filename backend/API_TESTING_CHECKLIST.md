@@ -258,7 +258,7 @@ Content-Type: application/json
 - [ ] Invalid `status` value returns `400` with a clear message
 - [ ] Missing `status` key returns `400` with a clear message
 - [ ] Non-existent `id` returns `404`
-- [ ] `PUT` on this endpoint returns `405 Method Not Allowed` (PATCH-only)
+- [ ] `PUT` on this endpoint returns `405 Method Not Allowed` (only PATCH and DELETE are allowed)
 
 **Request — valid**
 ```
@@ -321,6 +321,37 @@ Content-Type: application/json
 {
   "status": "done"
 }
+```
+
+**Response — `404 Not Found`**
+```json
+{
+  "detail": "No Task matches the given query."
+}
+```
+
+---
+
+## DELETE /api/tasks/<id>/
+
+- [ ] Deleting an existing task returns `204 No Content` with an empty body
+- [ ] The task no longer appears in `GET /api/tasks/`
+- [ ] Non-existent `id` returns `404`
+- [ ] `GET`/`PUT` on this endpoint remain `405 Method Not Allowed` (PATCH + DELETE only)
+
+**Request — valid**
+```
+DELETE /api/tasks/7/
+```
+
+**Response — `204 No Content`**
+```
+(empty body)
+```
+
+**Request — non-existent id**
+```
+DELETE /api/tasks/9999/
 ```
 
 **Response — `404 Not Found`**

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getTasks, updateTaskStatus } from '../api/tasks';
+import { getTasks, updateTaskStatus, deleteTask } from '../api/tasks';
 import { getErrorMessage } from '../api/errors';
 
 export function useTasks({ statusFilter, refreshTrigger } = {}) {
@@ -8,6 +8,8 @@ export function useTasks({ statusFilter, refreshTrigger } = {}) {
   const [error, setError] = useState(null);
   const [updatingIds, setUpdatingIds] = useState({});
   const [statusErrors, setStatusErrors] = useState({});
+  const [deletingIds, setDeletingIds] = useState({});
+  const [deleteErrors, setDeleteErrors] = useState({});
 
   useEffect(() => {
     let isMounted = true;
@@ -63,5 +65,32 @@ export function useTasks({ statusFilter, refreshTrigger } = {}) {
     }
   };
 
-  return { tasks, loading, error, updatingIds, statusErrors, updateStatus };
+  const removeTask = async (taskId) => {
+    setDeletingIds((prev) => ({ ...prev, [taskId]: true }));
+    setDeleteErrors((prev) => ({ ...prev, [taskId]: null }));
+
+    try {
+      await deleteTask(taskId);
+      setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    } catch (err) {
+      setDeleteErrors((prev) => ({
+        ...prev,
+        [taskId]: getErrorMessage(err, 'Failed to delete task. Please try again.'),
+      }));
+    } finally {
+      setDeletingIds((prev) => ({ ...prev, [taskId]: false }));
+    }
+  };
+
+  return {
+    tasks,
+    loading,
+    error,
+    updatingIds,
+    statusErrors,
+    updateStatus,
+    deletingIds,
+    deleteErrors,
+    removeTask,
+  };
 }
