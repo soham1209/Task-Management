@@ -1,133 +1,157 @@
 # Task Manager
 
-Task Manager assignment. Backend is Django + Django REST Framework (SQLite), frontend is React (Vite) + Axios. The backend exposes a `Task` model and API; the frontend is scaffolded but not yet wired up to it.
+A full-stack task management application. The backend is a Django REST
+Framework API backed by SQLite; the frontend is a React (Vite) single-page
+app styled with Tailwind CSS. Users can create tasks, filter them by status,
+update a task's status, and delete tasks — all changes are persisted via the
+API in real time.
+
+## Tech Stack
+
+| Layer    | Technology |
+|----------|------------|
+| Backend  | Django 6, Django REST Framework, SQLite, django-cors-headers |
+| Frontend | React 19, Vite, Axios, Tailwind CSS v4, lucide-react |
 
 ## Project Structure
 
 ```
 task-manager/
 ├── backend/
-│   ├── venv/                # Python virtual environment
 │   ├── manage.py
 │   ├── requirements.txt
-│   ├── task_manager/        # Django project (settings, urls, wsgi/asgi)
-│   └── tasks/                # Django app (models, serializers, views, urls)
-│       └── fixtures/         # sample_tasks.json fixture
-├── frontend/
-│   ├── src/
-│   │   ├── components/       # React components go here
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── vite.config.js
-│   └── package.json
-└── README.md
+│   ├── API_TESTING_CHECKLIST.md   # manual API test cases with example requests/responses
+│   ├── db.sqlite3                 # created after running migrations (gitignored)
+│   ├── task_manager/              # Django project config
+│   │   ├── settings.py
+│   │   └── urls.py
+│   └── tasks/                     # Django app — all task functionality lives here
+│       ├── models.py              # Task model
+│       ├── serializers.py         # TaskSerializer, TaskStatusUpdateSerializer
+│       ├── views.py                # TaskListCreateView, TaskDetailView
+│       ├── urls.py                 # /api/tasks/ routes
+│       ├── admin.py
+│       └── fixtures/
+│           └── sample_tasks.json  # 6 sample tasks for local development
+│
+└── frontend/
+    ├── index.html
+    ├── vite.config.js
+    └── src/
+        ├── App.jsx                 # top-level layout, owns shared filter/refresh state
+        ├── main.jsx
+        ├── api/
+        │   ├── tasks.js             # axios calls: getTasks, createTask, updateTaskStatus, deleteTask
+        │   └── errors.js            # parses DRF error responses into display-friendly messages
+        ├── hooks/
+        │   └── useTasks.js          # data fetching + create/update/delete state, used by TaskList
+        ├── components/
+        │   ├── TaskForm.jsx         # create-task form
+        │   ├── TaskFilter.jsx       # status filter pills
+        │   ├── TaskList.jsx         # fetches and renders the task list
+        │   ├── TaskItem.jsx         # single task card (status dropdown + delete)
+        │   ├── FormField.jsx        # shared labeled input/textarea with validation styling
+        │   └── Spinner.jsx          # shared loading spinner
+        └── constants/
+            └── taskStatus.js        # single source of truth for status values/labels/colors
 ```
 
-## Backend Setup
+## Getting Started
 
-Commands used to create the backend:
+### Prerequisites
+
+- Python 3.12+
+- Node.js 18+ and npm
+
+### Backend Setup
 
 ```bash
 cd task-manager/backend
 
-# Create and activate virtual environment
+# 1. Create a virtual environment
 python -m venv venv
+
+# 2. Activate it
 source venv/Scripts/activate      # Windows (Git Bash)
-# venv\Scripts\activate.bat       # Windows (cmd)
 # venv\Scripts\Activate.ps1       # Windows (PowerShell)
+# source venv/bin/activate        # macOS/Linux
 
-# Install dependencies
-python -m pip install --upgrade pip
-pip install django djangorestframework django-cors-headers
+# 3. Install dependencies
+pip install -r requirements.txt
 
-# Create Django project and app
-django-admin startproject task_manager .
-python manage.py startapp tasks
-
-# Freeze dependencies
-pip freeze > requirements.txt
-
-# Apply initial migrations
+# 4. Apply database migrations
 python manage.py migrate
-```
 
-To run the backend dev server:
+# 5. Load sample data (6 tasks: 2 pending, 2 in_progress, 2 done)
+python manage.py loaddata sample_tasks
 
-```bash
-cd task-manager/backend
-source venv/Scripts/activate
+# 6. Run the development server
 python manage.py runserver
 ```
 
-The API will be available at `http://localhost:8000/`.
+The API is now running at **http://localhost:8000/api/**.
 
-### Configuration notes
+> Re-running `loaddata sample_tasks` at any time is safe — it overwrites the
+> same fixed-id rows rather than duplicating them.
 
-- `INSTALLED_APPS` includes `rest_framework`, `corsheaders`, and `tasks`.
-- `corsheaders.middleware.CorsMiddleware` is added near the top of `MIDDLEWARE` (required by django-cors-headers).
-- `CORS_ALLOWED_ORIGINS` is set to `http://localhost:3000` to allow requests from the Vite frontend.
-- `DATABASES` uses the default `sqlite3` backend (`db.sqlite3` in `backend/`).
-- `REST_FRAMEWORK` is configured with `AllowAny` as the default permission class for now (no auth yet).
+### Frontend Setup
 
-### Reinstalling dependencies
-
-On a fresh clone, recreate the venv and install from `requirements.txt`:
-
-```bash
-cd task-manager/backend
-python -m venv venv
-source venv/Scripts/activate
-pip install -r requirements.txt
-```
-
-### Loading sample data
-
-A fixture with 6 sample tasks (2 `pending`, 2 `in_progress`, 2 `done`) is provided at `tasks/fixtures/sample_tasks.json`. To load it:
-
-```bash
-cd task-manager/backend
-source venv/Scripts/activate
-python manage.py migrate          # ensure tables exist first
-python manage.py loaddata sample_tasks
-```
-
-Django automatically searches each app's `fixtures/` directory, so the fixture name (`sample_tasks`, without the `.json` extension) is enough — no path or app prefix needed. Reviewers can then hit `GET http://localhost:8000/api/tasks/` (or `?status=pending` / `?status=in_progress` / `?status=done`) to see the loaded data immediately.
-
-Re-running `loaddata` is safe: each task has a fixed primary key, so it overwrites the same rows rather than duplicating them.
-
-### Testing the API
-
-See [`backend/API_TESTING_CHECKLIST.md`](backend/API_TESTING_CHECKLIST.md) for a manual testing checklist covering every endpoint, with example requests and responses.
-
-## Frontend Setup
-
-Commands used to create the frontend:
+In a separate terminal:
 
 ```bash
 cd task-manager/frontend
 
-# Scaffold a React app with Vite
-npm create vite@latest . -- --template react
-
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Install axios
-npm install axios
-
-# Create components folder
-mkdir -p src/components
-```
-
-To run the frontend dev server:
-
-```bash
-cd task-manager/frontend
+# 2. Run the development server
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000/` (the Vite dev server port was set to `3000` in `vite.config.js` to match the backend's CORS configuration).
+The app is now running at **http://localhost:3000/** and talks to the
+backend at `http://localhost:8000/api` (configured in `src/api/tasks.js`).
 
-## Next Steps (not yet implemented)
+Both servers need to be running at the same time for the app to work.
 
-- Wire up `src/components` with components that call the API via axios.
+## API Endpoints
+
+Base URL: `http://localhost:8000/api`
+
+| Method   | Endpoint            | Description                                  |
+|----------|----------------------|-----------------------------------------------|
+| `GET`    | `/tasks/`            | List all tasks, newest first |
+| `GET`    | `/tasks/?status=<status>` | List tasks filtered by status (`pending`, `in_progress`, or `done`); invalid values return `400` |
+| `POST`   | `/tasks/`            | Create a task. Body: `{ "title": str, "description"?: str, "status"?: str }`. `title` is required and non-blank; `status` defaults to `pending` |
+| `PATCH`  | `/tasks/<id>/`       | Update **only** a task's status. Body: `{ "status": str }` |
+| `DELETE` | `/tasks/<id>/`       | Delete a task. Returns `204 No Content` |
+
+All validation errors return `400` with a JSON body describing what's wrong,
+e.g. `{"title": ["Title cannot be empty."]}`. A missing task on `PATCH`/`DELETE`
+returns `404`. See [`backend/API_TESTING_CHECKLIST.md`](backend/API_TESTING_CHECKLIST.md)
+for the full set of request/response examples used to manually verify the API.
+
+## Assumptions & Design Decisions
+
+- **No authentication.** All tasks belong to a single shared list — there's
+  no concept of users or ownership. Adding auth was out of scope for this
+  assignment.
+- **Status is the only field that can be updated after creation.** There is
+  no endpoint to edit a task's title or description once created, by design
+  — `PATCH` is intentionally limited to `status` only.
+- **Status values are fixed** to `pending` / `in_progress` / `done`. There's
+  no API or UI for defining custom statuses.
+- **SQLite is used as-is**, suitable for local development and review, not
+  intended as a production database choice.
+- **No pagination** on `GET /tasks/` — acceptable given the expected size of
+  the task list for this assignment; would need to be added for large
+  datasets.
+- **CORS is restricted to `http://localhost:3000`** (the frontend dev
+  server's origin) and the frontend's API base URL is hardcoded to
+  `http://localhost:8000/api` — both assume local development, not a
+  configurable multi-environment deployment.
+- **Deleting a task asks for confirmation in the browser** (`window.confirm`)
+  before calling the API; there's no soft-delete or undo.
+- **No automated test suite.** Backend and frontend behavior were verified
+  manually throughout development (see `API_TESTING_CHECKLIST.md` for the
+  backend) rather than with an automated test suite like `pytest` or
+  `vitest`.
