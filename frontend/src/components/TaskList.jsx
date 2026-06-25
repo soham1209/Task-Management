@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTasks, updateTaskStatus } from '../api/api';
 import TaskItem from './TaskItem';
 
-function TaskList({ refreshTrigger }) {
+function TaskList({ refreshTrigger, statusFilter }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +15,7 @@ function TaskList({ refreshTrigger }) {
     setLoading(true);
     setError(null);
 
-    getTasks()
+    getTasks(statusFilter)
       .then((response) => {
         if (isMounted) setTasks(response.data);
       })
@@ -29,7 +29,7 @@ function TaskList({ refreshTrigger }) {
     return () => {
       isMounted = false;
     };
-  }, [refreshTrigger]);
+  }, [refreshTrigger, statusFilter]);
 
   const handleStatusChange = async (taskId, newStatus) => {
     const previousTask = tasks.find((task) => task.id === taskId);
@@ -69,7 +69,11 @@ function TaskList({ refreshTrigger }) {
   }
 
   if (tasks.length === 0) {
-    return <p className="text-gray-600">No tasks yet.</p>;
+    return (
+      <p className="text-gray-600">
+        {statusFilter ? 'No tasks match this filter.' : 'No tasks yet.'}
+      </p>
+    );
   }
 
   return (
