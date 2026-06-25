@@ -3,7 +3,7 @@ import { getTasks } from '../api/api';
 import TaskItem from './TaskItem';
 import './TaskList.css';
 
-function TaskList() {
+function TaskList({ refreshTrigger }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +28,7 @@ function TaskList() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [refreshTrigger]);
 
   if (loading) {
     return <p className="task-list-status">Loading tasks...</p>;
